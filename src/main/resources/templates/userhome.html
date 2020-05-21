@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<link href="css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<link href="css/userhome.css" rel="stylesheet" id="bootstrap-css">
+	<script src="js/jQuery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	
+	<script>
+	
+	function creTr(){
+		return $('<tr></tr>');
+	}
+	function creTd(data){
+		return $('<td>'+data+'</td>');
+	}
+	function creTdWithAEdit(data){
+		return $('<td><a style="cursor:pointer;" onclick=edit("'+data+'") >'+'X'+'</a></td>');
+	}
+	function creTdWithADelete(data){
+		return $('<td><a style="cursor:pointer;" onclick=deleteUser("'+data+'") >'+'X'+'</a></td>');
+	}
+		$(document).ready(function(){
+			getAllUsers();
+			$('.menu').on('click',function(){
+				
+				console.log($('#exampleModal'))
+				$('#exampleModal').show();
+				$('#saveBtn').show();
+			});
+		});
+		
+		function closeModal(){
+			$('#exampleModal').hide();
+			$('#saveBtn').hide();
+			$('#updateBtn').hide();
+			$('#userId').attr({'readonly':false});
+		}
+		function saveUser(){
+			var userId = $('#userId').val();
+			var userName = $('#userName').val();
+			var password = $('#password').val();
+			var url = window.location.origin;
+				url = url+"/saveUser?userId="+userId+"&userName="+userName+"&password="+password;
+			$.ajax({
+				  type: "POST",
+				  url: url,
+				  success:function(data){
+					  console.log(data);
+					  var obj = JSON.parse(data);
+					  console.log(obj);
+					  console.log(obj.message);
+					  alert("Data saved successfully.");
+					  closeModal();
+					  getAllUsers();
+				  },
+				  error:function(){
+					  alert("Error occurred.");
+				  }
+				});
+		}
+		function edit(userId){
+			$('#exampleModalLabel').text("EDIT USER");
+			$('#userId').attr({'readonly':'readonly'});
+			var url = window.location.origin;
+			url = url+"/editUser?userId="+userId;
+			$.ajax({
+				  type: "GET",
+				  url: url,
+				  success:function(data){
+					  var obj = JSON.parse(data);
+					  $('#exampleModal').show();
+					  $('#updateBtn').show();
+					  $('#userId').val(obj.userId);
+					  $('#userName').val(obj.userName);
+					  $('#password').val(obj.password);
+				  },
+				  error:function(){
+					  alert("Error occurred.");
+				  }
+				});
+		}
+		function updateUser(){
+			var url = window.location.origin;
+			var userId = $('#userId').val();
+			var userName = $('#userName').val();
+			var password = $('#password').val();
+			url = url+"/updateUser?userId="+userId+"&userName="+userName+"&password="+password;
+			$.ajax({
+				  type: "put",
+				  url: url,
+				  success:function(data){
+					  var obj = JSON.parse(data);
+					  alert(obj.message);
+					  getAllUsers();
+				  },
+				  error:function(){
+					  alert("Error occurred.");
+				  }
+				});
+			
+		}
+		function deleteUser(userId){
+			var url = window.location.origin;
+			url = url+"/deleteUser?userId="+userId;
+			$.ajax({
+				  type: "delete",
+				  url: url,
+				  success:function(data){
+					  var obj = JSON.parse(data);
+					  alert(obj.message);
+					  getAllUsers();
+				  },
+				  error:function(){
+					  alert("Error occurred.");
+				  }
+				});
+		
+		}
+		function getAllUsers(){
+			$('#userListTbody').empty();
+			var tbody = $('#userListTbody');
+			var url = window.location.origin;
+			url = url+"/getAllUsers"
+			$.ajax({
+				  type: "get",
+				  url: url,
+				  success:function(datas){
+					  var data = JSON.parse(datas);
+					  
+					for(var i=0;i<data.userList.length;i++){
+						var tr = creTr();
+						var td1 = creTd(i+1);
+						var td2 = creTd(data.userList[i].userId);
+						var td3 = creTd(data.userList[i].userName);
+						var td4 = creTd(data.userList[i].password);
+						var td5 = creTdWithAEdit(data.userList[i].userId);
+						var td6 = creTdWithADelete(data.userList[i].userId);
+						
+						
+						tbody.append(tr).append(td1).append(td2).append(td3).append(td4).append(td5).append(td6);
+					}
+				  },
+				  error:function(){
+					  alert("Error occurred.");
+				  }
+				});
+		}
+		function addUser(){
+			$('#exampleModalLabel').text("ADD USER");
+			$('#userId').val("");
+			$('#userName').val("");
+			$('#password').val("");
+			
+			$('#exampleModal').show();
+			$('#saveBtn').show();	
+		}
+	</script>
+</head>
+<div class="modal fade show" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel" align="center"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="recipient-name" class="col-form-label">User Id: </label>
+            <input type="text" class="form-control" id="userId">
+          </div>
+          <div class="form-group">
+            <label for="recipient-name" class="col-form-label">User Name: </label>
+            <input type="text" class="form-control" id="userName">
+          </div>
+          <div class="form-group">
+            <label for="recipient-name" class="col-form-label">Password: </label>
+            <input type="password" class="form-control" id="password">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer text-center" align="center">
+        <button type="button" id="saveBtn" class="btn btn-primary" style="display: none;" onclick="saveUser()">Save</button>
+        <button type="button" id="updateBtn" class="btn btn-primary" style="display: none;" onclick="updateUser()">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link menu" id="users" data-target="#exampleModal" >Users</a>
+      <a class="nav-item nav-link menu" id="userTran" >User Transactions</a>
+    </div>
+  </div>
+  </nav>
+<div id="userList" class="shadow p-3 mb-5 bg-white rounded table-responsive" style="max-height: 490px;">
+<div>
+	<table class="table table-hover">
+	  <thead class="thead-light">
+	    <tr>
+	      <th scope="col">Sl.No</th>
+	      <th scope="col">UserId</th>
+	      <th scope="col">UserName</th>
+	      <th scope="col">Password</th>
+	      <th scope="col">Edit</th>
+	      <th scope="col">Delete</th>
+	    </tr>
+	  </thead>
+	  <tbody id="userListTbody">
+	   
+	  </tbody>
+	</table>
+	</div>
+<div align="center" class="border-top border-primary" style="padding-top: 12px;">
+	<button type="button" class="btn btn-outline-primary" onclick="addUser();" >Add</button>
+</div>
+</div>
+</html>

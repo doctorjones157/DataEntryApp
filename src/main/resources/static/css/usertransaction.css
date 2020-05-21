@@ -1,0 +1,10 @@
+div.d-flex div.p-2 input{
+	border: 1px solid #c0c0c0;
+	border-radius: 4px;
+	padding-left: 10px;
+	
+}
+div.d-flex div.p-2 input:focus{
+	border: 1px solid #0080c0;
+	border-radius: 4px;	
+}

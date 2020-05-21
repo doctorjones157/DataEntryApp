@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<link href="css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<link href="css/login.css" rel="stylesheet" id="login-css">
+	<script src="js/jQuery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+</head>
+<div class="wrapper fadeInDown">
+  <div id="formContent">
+    <div class="fadeIn first" style="padding:10px;text-align: left;text-shadow: black;">
+      	Sign In
+    </div>
+    <!-- Login Form -->
+    <form th:action=@{/loginuser} th:object=${user} method="post">
+      <input type="text" id="login" class="fadeIn second" th:field=*{userId}  placeholder="login">
+      <input type="password" id="password" class="fadeIn third" th:field=*{password} placeholder="password">
+      <input type="submit" class="fadeIn fourth" value="Log In">
+    </form>
+
+  </div>
+</div>
+</html>

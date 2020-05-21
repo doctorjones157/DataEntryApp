@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<link href="css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<link href="css/userhome.css" rel="stylesheet" id="bootstrap-css">
+	<script src="js/jQuery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script>
+		function getTransDetails(){
+			var url = window.location.origin;
+			url = url+"/getTransactions?fromDate="+$('#fromDate').val()+"&toDate="+$('#toDate').val();
+		$.ajax({
+			  type: "GET",
+			  url: url,
+			  success:function(data){
+				 
+			  },
+			  error:function(){
+				  alert("Error occurred.");
+			  }
+			});
+		}
+	</script>
+</head>
+<body>
+	<nav class="navbar navbar-light bg-light">
+  		<form class="form-inline">
+		    <input class="form-control mr-sm-2" type="text" id="fromDate" placeholder="From date" onfocus="(this.type='date')" onblur="(this.type='text')" >
+		    <input class="form-control mr-sm-2" type="text" id="toDate" placeholder="To date" onfocus="(this.type='date')" onblur="(this.type='text')">
+		    <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="getTransDetails()">Search</button>
+  		</form>
+</nav>
+</body>
+</html>

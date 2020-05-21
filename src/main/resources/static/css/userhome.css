@@ -1,0 +1,17 @@
+nav div#navbarNavAltMarkup a{
+	color:white;
+}
+nav div#navbarNavAltMarkup a:hover{
+	font-weight: bold;
+	cursor: pointer;
+}
+#exampleModal{
+	z-index: 1100;
+}
+
+#userList{
+	padding: 10px;
+}
+div#userList table tbody#userListTbody tr td a{
+	cursor:pointer; 
+}
