@@ -1,0 +1,28 @@
+#usersListUL li {
+	background-color: #b7ff76b3;
+	
+}
+#usersListUL li:focus {
+	background-color: #265ef0;
+	color: white;
+}
+#mainContent{
+}
+
+#div2 {
+	padding:5px;
+}
+#userIdSpan{
+	font-weight:bold;
+	padding:1px;
+	border-bottom:1px solid red;
+}
+#userSubDetails span{
+	font-family:sans-serif;
+	background-color:#6f90ffa1;
+	color:block;
+}
+#userSubDetails div{
+	font-family:arial;
+	
+}

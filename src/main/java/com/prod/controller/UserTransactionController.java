@@ -36,7 +36,6 @@ public class UserTransactionController {
 	
 	@GetMapping("/userTransactions")
 	private String getUserTransaction(Model model) {
-		System.out.println("==usertrans==");
 		UserTransaction transaction = new UserTransaction();
 		IntStream.range(0, 2).forEach(a->{
 			UserTransaction u = new UserTransaction();
@@ -52,7 +51,6 @@ public class UserTransactionController {
 						,Model model
 						,@RequestParam("flag") String param 
 						) {
-		System.out.println("==>"+userTransaction.getTransactionList().size()+"====>");
 		if(param != null && param.equals("add")) {
 			IntStream.range(0, 1).forEach(a->{
 				UserTransaction u = new UserTransaction();
@@ -62,7 +60,6 @@ public class UserTransactionController {
 			this.userTransactionDao.saveTransaction(userTransaction);
 		}else if(param != null && param.equals("inputChange")) {
 			List<UserTransaction> transactionList =  this.userTransactionDao.getSavedTransactionList(userTransaction);
-			System.out.println(userTransaction.getTransactionList().size()+"==="+transactionList.size());
 			if(transactionList.size() > 0) {
 				userTransaction.setTransactionList(transactionList);
 			}else if(userTransaction.getTransactionList().size() == 0){
@@ -81,7 +78,6 @@ public class UserTransactionController {
 				
 		}
 		
-		System.out.println("userTransaction => "+userTransaction.getTransDate());
 		model.addAttribute("userTransaction",userTransaction);
 		model.addAttribute("userList",logindao.getAllUsers());
 		return "usertransactions";

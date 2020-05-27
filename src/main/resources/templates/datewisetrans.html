@@ -3,21 +3,104 @@
 <head>
 	<link href="css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 	<link href="css/userhome.css" rel="stylesheet" id="bootstrap-css">
+	<link href="css/datewisetransactions.css" rel="stylesheet" id="bootstrap-css">
 	<script src="js/jQuery.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script>
+	
+	function creli(userId,userName,weight){
+		var $li =  $('<li />',{
+			'class':'list-group-item d-flex justify-content-between align-items-center',
+			'data-userId':userId,
+			'text':userName,
+			'onclick':'getDetails("'+userId+'","'+userName+'");'
+		})
+		var $span = $('<span />',{
+			'class':'badge badge-primary badge-pill',
+			'text':weight
+		});
+		return $li.append($span);
+	}
+	
 		function getTransDetails(){
+			$('#userSubDetails').empty();
+			$('#userIdSpan').text("");
 			var url = window.location.origin;
 			url = url+"/getTransactions?fromDate="+$('#fromDate').val()+"&toDate="+$('#toDate').val();
 		$.ajax({
 			  type: "GET",
 			  url: url,
 			  success:function(data){
-				 
+				  var datas = JSON.parse(data);
+				  if(datas.userList.length == 0){
+					  alert("No Data Found");
+				  }
+				  createListGroup(datas);
 			  },
 			  error:function(){
 				  alert("Error occurred.");
 			  }
+			});
+		}
+		function createListGroup(datas){
+			$('#usersListUL').empty();
+			var $ul= $('#usersListUL');
+			for(var i=0;i<datas.userList.length;i++){
+				creli(datas.userList[i].userId,datas.userList[i].userName,datas.userList[i].weight).appendTo($ul);
+			}
+		}
+		function getDetails(userId,userName){
+
+			var url = window.location.origin;
+			url = url+"/getAllTransactionsByUserId?fromDate="+$('#fromDate').val()+"&toDate="+$('#toDate').val()+"&userId="+userId;
+		$.ajax({
+			  type: "GET",
+			  url: url,
+			  success:function(data){
+				  var datas = JSON.parse(data);
+				 $('#userIdSpan').text(userName);
+				 userSubDetails(datas);
+			  },
+			  error:function(){
+				  alert("Error occurred.");
+			  }
+			});
+			
+		}
+		function userSubDetails(data){
+			$('#userSubDetails').empty();
+			var $subDtl = $('#userSubDetails');
+			var oldDate;
+			var newDate;
+			var totWeight = 0;
+			for(var i=0;i<data.userList.length;i++){
+				newDate = data.userList[i].transDate;
+				var weight = data.userList[i].weight;
+				if(newDate !=oldDate){
+					totWeight = 0;
+					totWeight=totWeight+weight;
+					creSpan(newDate,'subDtlSpan').appendTo($subDtl);
+				}else{
+					totWeight=totWeight+weight;
+				}
+				
+				creSubDivs(weight).appendTo($subDtl);
+				
+				$('.subDtlSpan'+newDate).text(newDate+"   : "+totWeight);
+				oldDate = newDate;
+				
+			}
+		}
+		function creSpan(date,className){
+			return $('<span />',{
+				"text":date,
+				"class":className+date
+			});
+		}
+		function creSubDivs(data){
+			return $('<div />',{
+				"text":data,
+				"class":'subDivs'
 			});
 		}
 	</script>
@@ -29,6 +112,22 @@
 		    <input class="form-control mr-sm-2" type="text" id="toDate" placeholder="To date" onfocus="(this.type='date')" onblur="(this.type='text')">
 		    <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="getTransDetails()">Search</button>
   		</form>
-</nav>
+	</nav>
+	<div class="d-flex align-items-stretch bd-highlight" id="mainContent">
+		<div class="p-2 bd-highlight">
+			<ul class="list-group" id="usersListUL" style="cursor: pointer;">
+			
+			</ul>
+		</div>
+  		<div class="p-2 bd-highlight overflow-auto" id="div2">
+  			<div>
+  				<span id="userIdSpan"></span>
+  			</div>
+  			<div id="userSubDetails">
+  				
+  			</div>
+  		</div>
+	</div>
+	
 </body>
 </html>

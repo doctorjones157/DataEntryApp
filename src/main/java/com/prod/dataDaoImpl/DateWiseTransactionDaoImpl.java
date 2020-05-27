@@ -10,8 +10,10 @@ import org.springframework.stereotype.Repository;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.prod.dataDao.DateWiseTransactionDao;
+import com.prod.model.User;
 import com.prod.model.UserTransaction;
 
 @Repository
@@ -25,22 +27,51 @@ public class DateWiseTransactionDaoImpl implements DateWiseTransactionDao {
 
 		List<UserTransaction> transList = new ArrayList<UserTransaction>();
 
-		Map<String,AttributeValue> eav = new HashMap<String, AttributeValue>();
-		eav.put(":v1", new AttributeValue().withS(fromDate));
-		eav.put(":v2", new AttributeValue().withS(toDate));
-		eav.forEach((k,v) ->{
-			System.out.println(k+"<==>"+v);
-		});
+		Map<String, String> attributeNames = new HashMap<String, String >();
+        attributeNames.put("#transDate", "transDate");
+
+        Map<String,AttributeValue> eav = new HashMap<String, AttributeValue>();
+		  eav.put(":v1", new AttributeValue().withS(fromDate));
+		  eav.put(":v2", new AttributeValue().withS(toDate));
+		 
+		 DynamoDBScanExpression sc = new DynamoDBScanExpression()
+				 						   .withFilterExpression("#transDate between :v1 and :v2")
+				 						   .withExpressionAttributeNames(attributeNames)
+				 						   .withExpressionAttributeValues(eav);
+		transList= dynamoDBMapper.scan(UserTransaction.class, sc);
 		
-		DynamoDBQueryExpression<UserTransaction> queryExpression = new DynamoDBQueryExpression<UserTransaction>() 
-			    .withKeyConditionExpression("transDate between :v1 and :v2")
-			    .withExpressionAttributeValues(eav);
+		System.out.println(transList.size()+"<==LIST SIZE==> DAO");
 		
-		try {
-		transList = dynamoDBMapper.query(UserTransaction.class, queryExpression);
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		return transList;
+	}
+
+	@Override
+	public String getUserNameById(String k) {
+		User user = dynamoDBMapper.load(User.class, k);
+		return user.getUserName();
+	}
+
+	@Override
+	public List<UserTransaction> getTransactionByDateAndUserId(String fromDate, String toDate, String userId) {
+
+
+		List<UserTransaction> transList = new ArrayList<UserTransaction>();
+
+		Map<String, String> attributeNames = new HashMap<String, String >();
+		attributeNames.put("#userId", "userId");
+        attributeNames.put("#transDate", "transDate");
+
+        Map<String,AttributeValue> eav = new HashMap<String, AttributeValue>();
+		  eav.put(":v1", new AttributeValue().withS(fromDate));
+		  eav.put(":v2", new AttributeValue().withS(toDate));
+		  eav.put(":v3", new AttributeValue().withS(userId));
+		 
+		 DynamoDBScanExpression sc = new DynamoDBScanExpression()
+				 						   .withFilterExpression("#userId =:v3 and #transDate between :v1 and :v2")
+				 						   .withExpressionAttributeNames(attributeNames)
+				 						   .withExpressionAttributeValues(eav);
+		transList= dynamoDBMapper.scan(UserTransaction.class, sc);
+		
 		System.out.println(transList.size()+"<==LIST SIZE==> DAO");
 		
 		return transList;
